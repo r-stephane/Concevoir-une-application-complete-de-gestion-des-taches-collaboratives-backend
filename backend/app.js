@@ -19,22 +19,29 @@ mongoose
     console.log("Connection to database failed:::", error);
   });
 
-// Middleware CSP pour résoudre l'erreur favicon
+// Middleware CORS en premier
+app.use(cors());
+
+// Middleware pour parser le JSON
+app.use(express.json());
+
+// Middleware CSP CORRIGÉ - version simplifiée et fonctionnelle
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; img-src 'self' data: https:; connect-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:"
+    "default-src 'self' https://concevoir-une-application-complete-de.onrender.com; img-src 'self' data: https:; script-src 'self'; style-src 'self' 'unsafe-inline'"
   );
   next();
 });
 
-// Middleware to handle any json payload data sent from a client
-app.use(express.json());
-app.use(cors());
-
 // Routes
 app.use("/clients", routeClient);
 app.use("/users", userRouter);
+
+// Route pour servir le favicon explicitement
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // No Content - si vous n'avez pas de favicon
+});
 
 app.post('/register', (req, res) => {
   console.log(req.body); 
